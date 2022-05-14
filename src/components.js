@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-let formValues = {
+const formValues = {
   memeTemplate: 'aag',
   topText: '',
   bottomText: '',
@@ -30,101 +30,98 @@ export function MemeForm({ memeRequest, setMemeRequest }) {
       setMemeTemplates(json);
     };
 
-    fetchData();
+    fetchData().catch((reject) => {
+      throw reject;
+    });
   }, []);
   return (
-    <>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          setMemeRequest({
-            memeTemplate: formValues.memeTemplate,
-            topText: formValues.topText,
-            bottomText: formValues.bottomText,
-          });
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setMemeRequest({
+          memeTemplate: formValues.memeTemplate,
+          topText: formValues.topText,
+          bottomText: formValues.bottomText,
+        });
 
-          // can't put this into one line
-          let array;
-          array = JSON.parse(sessionStorage.getItem('memeHistory'));
-          array.push(formValues);
-          sessionStorage.setItem('memeHistory', JSON.stringify(array));
+        // can't put this into one line
+        const array = JSON.parse(sessionStorage.getItem('memeHistory'));
+        array.push(formValues);
+        sessionStorage.setItem('memeHistory', JSON.stringify(array));
+      }}
+    >
+      <label htmlFor="memeTemplate">Meme template</label>
+      <select
+        id="memeTemplate"
+        onBlur={(e) => {
+          formValues.memeTemplate = e.target.value;
         }}
       >
-        <label htmlFor="memeTemplate">Meme template</label>
-        <select
-          id="memeTemplate"
-          onBlur={(e) => {
-            formValues.memeTemplate = e.target.value;
-          }}
-        >
-          {memeTemplates.map((element) => {
-            return (
-              <option key={element.id} value={element.id}>
-                {element.name}
-              </option>
-            );
-          })}
-        </select>
-        <br />
-        <label htmlFor="topText">Top text</label>
-        <input
-          type="text"
-          id="topText"
-          onBlur={(e) => {
-            formValues.topText = encodeURIComponent(e.target.value).replace(
-              '%2F',
-              '%252F',
-            );
-          }}
-        />
-        <br />
-        <label htmlFor="bottomText">Bottom text</label>
-        <input
-          type="text"
-          id="bottomText"
-          onBlur={(e) => {
-            formValues.bottomText = encodeURIComponent(e.target.value).replace(
-              '%2F',
-              '%252F',
-            );
-          }}
-        />
-        <br />
-        <input data-test-id="generate-meme" type="submit" value="Generate" />
-        <button
-          type="button"
-          onClick={() => {
-            downloadImage(
-              `https://api.memegen.link/images/${memeRequest.memeTemplate}/${memeRequest.topText}/${memeRequest.bottomText}.gif`,
-            );
-          }}
-        >
-          Download
-        </button>
-      </form>
-    </>
+        {memeTemplates.map((element) => {
+          return (
+            <option key={element.id} value={element.id}>
+              {element.name}
+            </option>
+          );
+        })}
+      </select>
+      <br />
+      <label htmlFor="topText">Top text</label>
+      <input
+        id="topText"
+        onBlur={(e) => {
+          formValues.topText = encodeURIComponent(e.target.value).replace(
+            '%2F',
+            '%252F',
+          );
+        }}
+      />
+      <br />
+      <label htmlFor="bottomText">Bottom text</label>
+      <input
+        id="bottomText"
+        onBlur={(e) => {
+          formValues.bottomText = encodeURIComponent(e.target.value).replace(
+            '%2F',
+            '%252F',
+          );
+        }}
+      />
+      <br />
+      <input data-test-id="generate-meme" type="submit" value="Generate" />
+      <button
+        type="button"
+        onClick={() => {
+          downloadImage(
+            `https://api.memegen.link/images/${memeRequest.memeTemplate}/${memeRequest.topText}/${memeRequest.bottomText}.gif`,
+          ).catch((reject) => {
+            throw reject;
+          });
+        }}
+      >
+        Download
+      </button>
+    </form>
   );
 }
 
 export function RequestHistory() {
   return (
-    <>
-      <div>
-        History
-        <br />
-        {JSON.parse(sessionStorage.getItem('memeHistory')).map((element) => {
-          return (
-            <>
-              <img
-                width="100px"
-                src={`https://api.memegen.link/images/${element.memeTemplate}/${element.topText}/${element.bottomText}.gif`}
-                alt="a meme you generated"
-              />
-              <br />
-            </>
-          );
-        })}
-      </div>
-    </>
+    <div>
+      History
+      <br />
+      {JSON.parse(sessionStorage.getItem('memeHistory')).map((element) => {
+        return (
+          <div key={element.memeTemplate}>
+            <img
+              width="100px"
+              src={`https://api.memegen.link/images/${element.memeTemplate}/${element.topText}/${element.bottomText}.gif`}
+              alt="a meme you generated"
+            />
+            <br />
+          </div>
+        );
+      })}
+    </div>
   );
 }

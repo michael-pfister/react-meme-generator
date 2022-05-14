@@ -16,7 +16,7 @@ function App() {
     <div className="App">
       <h2>react meme generator</h2>
       <MemeForm memeRequest={memeRequest} setMemeRequest={setMemeRequest} />
-      <br></br>
+      <br />
       <div>
         <img
           src={`https://api.memegen.link/images/${memeRequest.memeTemplate}/${memeRequest.topText}/${memeRequest.bottomText}.gif`}
@@ -25,7 +25,7 @@ function App() {
           width="300px"
         />
       </div>
-      <br></br>
+      <br />
       <RequestHistory />
     </div>
   );
